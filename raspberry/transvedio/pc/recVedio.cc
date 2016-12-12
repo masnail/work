@@ -41,17 +41,22 @@ void Recvdeio::getVedio()
 	exit(-1);
     }
 
-    //初始化Mat 大小
-    if(!_vedio.data)
-	_vedio = Mat::zeros(row, col, CV_8UC3);
+    //初始化Mat 大小,以后不再分配地址
+    if(!_vedio[0].data)
+    {
+	for(int i = 0; i < _BUFF_CNT; ++i)
+	    _vedio[i] = Mat::zeros(row, col, CV_8UC3);
+    }
 
     int length = 0;
+    int show_index = -1,storge_index = 0;//显示缓存视频帧,存储缓存视频帧
     while(1)
     {
     for(int i = 0; i < row; ++i)
     {
-	//按行发送
-	uchar *pData = _vedio.ptr<uchar>(i);
+	//按行接受
+	storge_index %= _BUFF_CNT;
+	uchar *pData = _vedio[storge_index++].ptr<uchar>(i);
 	
 	length = 0;
 	while(length < col*3)
@@ -66,8 +71,13 @@ void Recvdeio::getVedio()
 	}
 
     }
-    imshow("rec",_vedio);
-    waitKey(20);
+
+    if(show_index++)
+    {
+	show_index %= _BUFF_CNT;
+	imshow("rec",_vedio[show_index++]);
+    }
+    waitKey(30) ;
     }
     //return _vedio;
 

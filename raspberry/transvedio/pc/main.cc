@@ -22,7 +22,7 @@ void  *pthread_fun(void *p)
 
     cout << ip->winame << endl;
 //	imshow(ip->winame,vedio.getVedio());
-    //while(1)
+    while(1)
     {
 	//cout<<"1"<<endl;
 	vedio.getVedio();
