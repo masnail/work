@@ -13,6 +13,7 @@ Raspivedio::Raspivedio(int port, char *ip)
     memset(_ip, 17, 0);
     memcpy(_ip, ip, 16);
     socket_client_udp(&_fd, _port, _ip, &_ipaddr);
+    _cap.open(0);//打开摄像头
 }
 
 Raspivedio::~Raspivedio()
@@ -20,29 +21,27 @@ Raspivedio::~Raspivedio()
     close(_fd);
 }
 
-void Raspivedio::readVedio()
+/*void Raspivedio::readVedio()
 {
-   /* _vedio = imread("1.jpg");
-    if(!_vedio.data)
-    {	
-	printf("read vedio NUll");
-	return;
-    }*/
-
     //摄像头采集
-    VideoCapture capture(0);
-    //waitKey(10);
-  //  capture >> _vedio;
+    _cap >> _vedio;
+    sendtoVedio();
     //close(cap);
    // imshow("cap",_vedio);
     //cout<<_vedio.rows<<endl;
-}
+}*/
 
-void Raspivedio::sendtoVedio(Mat _vedio)
-{
+void Raspivedio::sendtoVedio()
+{  
 
-    //获取Mat
-    //readVedio();
+    //摄像头采集
+    _cap >> _vedio;
+    if(!_vedio.data)
+    {
+	cout << "capture video error!" << endl;
+	return;
+    }
+    resize(_vedio, _vedio, Size(300, 200));
 
     //获取vedio的大小
     int row = _vedio.rows,
@@ -83,5 +82,7 @@ void Raspivedio::sendtoVedio(Mat _vedio)
 	    length += ret;
 	}
     }
+    //imshow("raspi",_vedio);
+    // imwrite("2.jpg",_vedio);
     
 }

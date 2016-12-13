@@ -22,9 +22,8 @@ void  *pthread_fun(void *p)
 
     cout << ip->winame << endl;
 //	imshow(ip->winame,vedio.getVedio());
-    while(1)
+    //while(1)
     {
-	//cout<<"1"<<endl;
 	vedio.getVedio();
 	//imshow(ip->winame,vedio.getVedio());
 	//waitKey(40);
@@ -34,7 +33,7 @@ void  *pthread_fun(void *p)
 int main(int argc,char *argv[])
 {
     int port = 8120;
-    char ip[17] = "192.168.109";
+    char ip[17] = "192.168.115";
     int cnt = 1;//线程的数量
 
     ipaddr addr[2];

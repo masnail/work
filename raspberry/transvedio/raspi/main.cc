@@ -11,18 +11,15 @@
 int main(int argc,char *argv[])
 {
     int port =8120;
-    char ip[17] = "192.168.1.109";
+    char ip[17] = "192.168.1.115";
 
 
     Raspivedio raspi(port, ip);
-    VideoCapture cap(0);
-    Mat src;
+    
     while(1)
     {
-	cap >> src;
-	//imshow("cap",src);
-
-	raspi.sendtoVedio(src);
+	//raspi.readVedio();
+	raspi.sendtoVedio();
 	waitKey(30);
     }
 
