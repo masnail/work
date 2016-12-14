@@ -11,7 +11,7 @@
 int main(int argc,char *argv[])
 {
     int port =8120;
-    char ip[17] = "192.168.1.115";
+    char ip[17] = "192.168.1.100";
 
 
     Raspivedio raspi(port, ip);

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <raspicam/raspicam_cv.h>//raspiberry use
 
 /* OPENCV HEAD FILE */
 #include "opencv2/opencv.hpp"

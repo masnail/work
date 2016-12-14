@@ -13,29 +13,40 @@ Raspivedio::Raspivedio(int port, char *ip)
     memset(_ip, 17, 0);
     memcpy(_ip, ip, 16);
     socket_client_udp(&_fd, _port, _ip, &_ipaddr);
-    _cap.open(0);//打开摄像头
+    //_cap.open(0);//打开摄像头
+    _camera.set(CV_CAP_PROP_FORMAT, CV_8UC3);
+    if(!_camera.open())
+    {
+	cout << "open camera fail" << endl;
+	exit(-1);
+    }
 }
 
 Raspivedio::~Raspivedio()
 {
     close(_fd);
+    _camera.release();
 }
 
-/*void Raspivedio::readVedio()
+void Raspivedio::readVedio()
 {
     //摄像头采集
-    _cap >> _vedio;
-    sendtoVedio();
-    //close(cap);
-   // imshow("cap",_vedio);
-    //cout<<_vedio.rows<<endl;
-}*/
+//  _cap >> _vedio;
+//  sendtoVedio();
+    
+    /* raspi video */
+    _camera.grab();
+    _camera.retrieve(_vedio);
+
+}
 
 void Raspivedio::sendtoVedio()
 {  
 
     //摄像头采集
-    _cap >> _vedio;
+    readVedio();
+
+
     if(!_vedio.data)
     {
 	cout << "capture video error!" << endl;

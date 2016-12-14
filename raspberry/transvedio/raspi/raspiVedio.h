@@ -20,12 +20,13 @@ class Raspivedio
 	struct sockaddr_in _ipaddr;//绑定后的族
 
 	Mat _vedio;//摄像头的帧
-	VideoCapture _cap;//摄像头的获取
+	raspicam::RaspiCam_Cv _camera;//摄像头的获取
+	//VideoCapture _cap;
 
     public:
 	Raspivedio(int port, char *ip);
 	~Raspivedio();
-	//void readVedio();
+	void readVedio();
 	void sendtoVedio();
 };
 
