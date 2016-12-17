@@ -10,7 +10,7 @@
 
 #include "head.h"
 
-#define _BUFF_CNT 2 //接受视频缓存帧数
+#define _BUFF_CNT 1 //接受视频缓存帧数
 
 class Recvdeio
 {
@@ -18,6 +18,7 @@ class Recvdeio
 	int _port;//本地PORT
 //	char _ip[17];//本地ip
 	struct sockaddr_in _sendip;//发送端地址
+	socklen_t _addrlen;//长度
 
 	int _fd;//文件描述符
 	Mat _vedio[_BUFF_CNT];//接受视频的一个帧

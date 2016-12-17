@@ -20,9 +20,9 @@ void  *pthread_fun(void *p)
     ipaddr *ip = (ipaddr*)p;
     Recvdeio vedio(ip->port);
 
-    cout << ip->winame << endl;
+    //cout << ip->winame << endl;
 //	imshow(ip->winame,vedio.getVedio());
-    //while(1)
+    while(1)
     {
 	vedio.getVedio();
 	//imshow(ip->winame,vedio.getVedio());

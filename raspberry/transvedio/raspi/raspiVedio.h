@@ -16,9 +16,10 @@ class Raspivedio
 	int _port;//接受端的PORT
 	int _fd;//文件描述符
 	char _ip[17];//接受端的ip
+	int start_flag;// '#' 视频开始的标志
 	
 	struct sockaddr_in _ipaddr;//绑定后的族
-
+	
 	Mat _vedio;//摄像头的帧
 	raspicam::RaspiCam_Cv _camera;//摄像头的获取
 	//VideoCapture _cap;
