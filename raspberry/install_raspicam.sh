@@ -1,5 +1,4 @@
 #!/bin/bash
-    cd raspicam
     mkdir build
     cd build
     cmake ..
