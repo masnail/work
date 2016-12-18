@@ -5,7 +5,7 @@
 * Description: C++ file
 ************************************************************************/
 
-#include "recVedio.h"
+#include "recVideo.h"
 #include <iostream>
 #include <pthread.h>
 
@@ -33,7 +33,15 @@ void  *pthread_fun(void *p)
 int main(int argc,char *argv[])
 {
     int port = 8120;
-    char ip[17] = "192.168.115";
+
+    Recvideo video(port);
+    while(1)
+    {
+	video.getVedio();
+	//imshow(ip->winame,video.getVedio());
+	//waitKey(40);
+    }
+    /*char ip[17] = "192.168.115";
     int cnt = 1;//线程的数量
 
     ipaddr addr[2];
@@ -58,7 +66,7 @@ int main(int argc,char *argv[])
 	    if(pthread_join(pid[i], NULL) == 0)
 		ret += 1;
 	}
-    }
+    }*/
 
    // Recvideo video(port);
     

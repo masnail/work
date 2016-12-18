@@ -23,6 +23,7 @@ class Recvideo
 	int _fd;//文件描述符
 	Mat _video[_BUFF_CNT];//接受视频的一个帧
 
+
     public:
 	Recvideo(int port);
 	~Recvideo();

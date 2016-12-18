@@ -45,12 +45,12 @@ Raspivideo::~Raspivideo()
 void Raspivideo::readVideo()
 {
     //摄像头采集
-//  _cap >> _video;
-//  sendtoVideo();
+  _cap >> _video;
+  //sendtoVideo();
     
     /* raspi video */
-    _camera.grab();
-    _camera.retrieve(_video);
+   // _camera.grab();
+   // _camera.retrieve(_video);
 
 }
 
@@ -65,7 +65,8 @@ void Raspivideo::sendtoVideo()
 	cout << "capture video error!" << endl;
 	return;
     }
-    resize(_video, _video, Size(300, 200));
+    //cvtColor(_video, _video, COLOR_HLS2RGB);
+    resize(_video, _video, Size(500, 600));
 
     //获取video的大小
     int row = _video.rows,
@@ -126,8 +127,9 @@ void Raspivideo::sendtoVideo()
 	    length += ret;
 	}
     }
-	    
-    //imshow("raspi",_video);
+
+   	    
+    // imshow("raspi",_video);
     // imwrite("2.jpg",_video);
     
 }

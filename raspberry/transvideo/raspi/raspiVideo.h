@@ -16,7 +16,7 @@ class Raspivideo
 	char _port[6];//接受端的PORT
 	int _fd;//文件描述符
 	char _ip[17];//接受端的ip
-	int start_flag;// '#' 视频开始的标志
+	int start_flag;// '-1' 视频开始的标志
 	
 	struct sockaddr_in _ipaddr;//绑定后的族
 	

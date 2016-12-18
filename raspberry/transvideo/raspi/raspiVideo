@@ -7,11 +7,21 @@
 
 #include "raspiVideo.h"
 
-Raspivideo::Raspivideo(int port, char *ip)
+Raspivideo::Raspivideo()
     :_port(port)
 {
     memset(_ip, 17, 0);
-    memcpy(_ip, ip, 16);
+
+    //读取配置文件，减少编译时间
+    _fp = fopen("config","r");
+    if(_fp == NULL)
+    {
+	perror("read config file error!");
+	exit(-1);
+    }
+    fgets(_ip, 16, _fp);
+    fgets(_port, 5, _fp);
+    fclose(_fp);//关闭文件
 
     //视频开始标志赋值
     start_flag = -1;
