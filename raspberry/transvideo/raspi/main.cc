@@ -10,11 +10,8 @@
     
 int main(int argc,char *argv[])
 {
-    int port =8120;
-    char ip[17] = "192.168.1.115";
 
-
-    Raspivideo raspi(port, ip);
+    Raspivideo raspi;
     
     while(1)
     {

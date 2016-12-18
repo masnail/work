@@ -13,7 +13,7 @@
 class Raspivideo
 {
     private:
-	int _port;//接受端的PORT
+	char _port[6];//接受端的PORT
 	int _fd;//文件描述符
 	char _ip[17];//接受端的ip
 	int start_flag;// '#' 视频开始的标志
@@ -22,10 +22,12 @@ class Raspivideo
 	
 	Mat _video;//摄像头的帧
 	raspicam::RaspiCam_Cv _camera;//摄像头的获取
-	//VideoCapture _cap;
+	VideoCapture _cap;
+
+	FILE *_fp;//配置文件描述符
 
     public:
-	Raspivideo(int port, char *ip);
+	Raspivideo();
 	~Raspivideo();
 	void readVideo();
 	void sendtoVideo();
