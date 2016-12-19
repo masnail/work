@@ -105,6 +105,7 @@ void Recvideo::getVedio()
 	    ret = recvfrom(_fd, pData + length, col*3 - length, 0, NULL, NULL);
 	    if(-1 == ret)
 	    {
+	    cout << length << endl;
 		perror("recv Mat data error!");
 		exit(-1);
 	    }

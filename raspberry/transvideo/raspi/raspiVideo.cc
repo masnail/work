@@ -8,7 +8,6 @@
 #include "raspiVideo.h"
 
 Raspivideo::Raspivideo()
-    :_port(port)
 {
     memset(_ip, 17, 0);
 
@@ -26,7 +25,7 @@ Raspivideo::Raspivideo()
     //视频开始标志赋值
     start_flag = -1;
     //adp socket 建立
-    socket_client_udp(&_fd, _port, _ip, &_ipaddr);
+    socket_client_udp(&_fd, atoi(_port), _ip, &_ipaddr);
     //_cap.open(0);//打开摄像头
     _camera.set(CV_CAP_PROP_FORMAT, CV_8UC3);
     if(!_camera.open())
