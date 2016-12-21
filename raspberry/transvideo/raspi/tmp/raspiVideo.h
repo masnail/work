@@ -25,7 +25,6 @@ class Raspivideo
 	VideoCapture _cap;
 	FILE *_fp;//配置文件描述符
 
-	bool vStart;
     private:
 	//帧的大小
 	int _row;
@@ -37,9 +36,6 @@ class Raspivideo
 	~Raspivideo();
 	void readVideo();
 	void sendtoVideo();
-
-    public:
-	void sendtoSize();
 };
 
 #endif

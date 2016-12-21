@@ -17,7 +17,6 @@ int main(int argc,char *argv[])
     {
 	//raspi.readVideo();
 	raspi.sendtoVideo();
-	waitKey(20);
     }
 
     return 0;

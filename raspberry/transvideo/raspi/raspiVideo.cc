@@ -9,7 +9,7 @@
 
 Raspivideo::Raspivideo()
 {
-    memset(_ip, 17, 0);
+    memset(_ip, sizeof(_ip), 0);
 
     //读取配置文件，减少编译时间
     _fp = fopen("config","r");
@@ -18,8 +18,23 @@ Raspivideo::Raspivideo()
 	perror("read config file error!");
 	exit(-1);
     }
-    fgets(_ip, 16, _fp);
-    fgets(_port, 5, _fp);
+    fgets(_ip, sizeof(_ip)-1, _fp);
+    fgets(_port, sizeof(_port)-1, _fp);
+
+
+    //帧Size初始化
+    char buff[10];
+    fgets(buff, sizeof(buff)-1, _fp);
+    _row = atoi(buff);
+    fgets(buff, sizeof(buff)-1, _fp);
+    _col = atoi(buff);
+    if(_row == 0 || _col == 0)
+    {
+	_row = 200;
+	_col = 200;
+    }
+
+
     fclose(_fp);//关闭文件
 
     //视频开始标志赋值
@@ -33,6 +48,7 @@ Raspivideo::Raspivideo()
 	cout << "open camera fail" << endl;
 	exit(-1);
     }
+    vStart =false;
 }
 
 Raspivideo::~Raspivideo()
@@ -44,8 +60,9 @@ Raspivideo::~Raspivideo()
 void Raspivideo::readVideo()
 {
     //摄像头采集
-//  _cap >> _video;
+ // _cap >> _video;
 //  sendtoVideo();
+
     
     /* raspi video */
     _camera.grab();
@@ -64,15 +81,11 @@ void Raspivideo::sendtoVideo()
 	cout << "capture video error!" << endl;
 	return;
     }
-    resize(_video, _video, Size(300, 200));
+    resize(_video, _video, Size(_row, _col));
 
-    //获取video的大小
-    int row = _video.rows,
-	col = _video.cols;
+    int ret;//返回值
 
-    int ret = 0;
-
-    //发送视频开始标志 #
+       //发送视频开始标志 #
     ret = sendto(_fd, &start_flag, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
     if(-1 == ret)
     {
@@ -80,43 +93,24 @@ void Raspivideo::sendtoVideo()
 	exit(-1);
     }
 
-    //发送Mat行
-    ret = sendto(_fd, &row, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
-    if(-1 == ret)
-    {
-	perror("sendto row data error!");
-	exit(-1);
-    }
-
-    //发送Mat列
-    ret = sendto(_fd, &col, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
-    if(-1 == ret)
-    {
-	perror("sendto col data error!");
-	exit(-1);
-    }
-
     //发送Mat
     int length = 0;
-    for(int i = 0; i < row; ++i)
+    for(int i = 0; i < _row; ++i)
     {
-	int tmp = i;
 	//发送mat的开始索引，解决UDP无序问题
-	ret = sendto(_fd, &tmp, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
+	ret = sendto(_fd, &i, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
 	if(-1 == ret)
 	{
-	    perror("sendto Mat row index error!");
+	    perror("sendto Mat _row index error!");
 	    exit(-1);
 	}
 
 	length =0;
 	uchar *pData = _video.ptr<uchar>(i);
-	while(length < col*3)
+	while(length < _col*3)
 	{
-	    length += ret;
-
 	    //发送MAT一行的数据
-	    ret = sendto(_fd, pData+length, col*3 - length, 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
+	    ret = sendto(_fd, pData+length, _col*3 - length, 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
 	    if(-1 == ret)
 	    {
 		perror("sendto Mat data error!");
@@ -128,5 +122,29 @@ void Raspivideo::sendtoVideo()
 	    
     //imshow("raspi",_video);
     // imwrite("2.jpg",_video);
+    waitKey(30);
     
+}
+
+/* 发送帧Size（Row ，Col） */
+void Raspivideo::sendtoSize()
+{
+    int ret;//返回值
+    
+    //发送Mat行
+    ret = sendto(_fd, &_row, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
+    if(-1 == ret)
+    {
+	perror("sendto row data error!");
+	exit(-1);
+    }
+
+    //发送Mat列
+    ret = sendto(_fd, &_col, sizeof(int), 0, (struct sockaddr*)&_ipaddr, sizeof(struct sockaddr));
+    if(-1 == ret)
+    {
+	perror("sendto col data error!");
+	exit(-1);
+    }
+
 }

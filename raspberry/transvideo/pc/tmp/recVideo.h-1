@@ -1,7 +1,7 @@
 /*************************************************************************
 * Author: MASnail
 * Created Time: 2016年12月12日 星期一 09时16分40秒
-* File Name: recVideo.h
+* File Name: recVedio.h
 * Description: HEAD File
 *************************************************************************/
 
@@ -15,19 +15,14 @@
 class Recvideo
 {
     private:
-	char _port[6];//本地PORT
-	int _endFlag = -1;//结束标志
-	bool _vStart = false;//视频开始接受的判断
-
-    private:
+	int _port;//本地PORT
+//	char _ip[17];//本地ip
 	struct sockaddr_in _sendip;//发送端地址
 	socklen_t _addrlen;//长度
 
 	int _fd;//文件描述符
-
     private:
-	//缓冲区
-	Mat _buff;
+	Mat _video[_BUFF_CNT];//接受视频的一个帧
 
     private:
 	int _row;//长
@@ -35,15 +30,12 @@ class Recvideo
 
 
     public:
-	Recvideo();
+	Recvideo(int port);
 	~Recvideo();
-
-    public:
-	void recVideo();//接受socket视频
-	void changeSize();//改变图像尺寸
-	void playVideo();//显示视频
-	void recvStart();//视频接受开始的确认
-
+	void getVedio();//接受视频帧
+	void transEnd();
+	
+	//图像的处理
 };
 
 #endif

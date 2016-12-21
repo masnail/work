@@ -20,15 +20,37 @@ Recvideo::Recvideo()
     //初始化socket
     socket_server_udp(&_fd,atoi(_port));
     memset(&_sendip, 0, sizeof(struct sockaddr_in));
-    
-    _row = 200;
-    _col = 200;
-    _buff = Mat::zeros(_row, _col, CV_8UC3);
+
 }
 
 Recvideo::~Recvideo()
 {
     close(_fd);
+}
+
+/* 填充视频帧 */
+void Recvideo::recvBuff()
+{
+    if(!_bFlag1)
+    {
+	for(int i = 0; i < _BUFF_CNT; ++i)
+	{ 
+	    recVideo(_buff1, i);
+	}
+	//切换到下一个buff
+	_bFlag1 = !_bFlag1;
+    }
+
+    if(!_bFlag2)
+    {
+	for(int i = 0; i < _BUFF_CNT; ++i)
+	{ 
+	    recVideo(_buff2, i);
+	}
+	//切换到下一个buff
+	_bFlag2 = !_bFlag2;
+    }
+
 }
 
 /* 接受视频
@@ -38,17 +60,16 @@ Recvideo::~Recvideo()
  *
  * 使用下标遍历方式
  */
-void Recvideo::recVideo()
+void Recvideo::recVideo(Mat * buff, int index)
 {
-
-    int ret = 0,//接受返回值
-    videoIndex = 0,//当前接受到帧的下标
-    flag,//开始标志
-    length = 0;//接受到数据的长度，减少发送和接受不匹配
-
     //开始接受数据
     recvStart();
-    
+    //初始化视频大小
+    changeSize();
+
+    int ret = 0,//接受返回值
+	videoIndex = 0,//当前接受到帧的下标
+	length = 0;//接受到数据的长度，减少发送和接受不匹配
 
     for(int i = 0; i < _row; ++i)
     {	
@@ -59,33 +80,36 @@ void Recvideo::recVideo()
 	    perror("recv Mat tmp_index data error!");
 	    exit(-1);
 	}
-//	if(videoIndex > _row)
-//	    return;
+	
+	if(videoIndex > _row)
+	    return;
 
-	uchar *pData = _buff.ptr<uchar>(videoIndex);
+	uchar *pData = buff[index].ptr<uchar>(videoIndex);
 
 	//接受MAT数据
 	length = 0;
 	while(length < _col*3)
 	{
 	    ret = recvfrom(_fd, pData + length, _col*3 - length, 0, NULL, NULL);
-	    if( _endFlag == ret)
+	    if( _endFlag== ret)
 	    {
 		perror("recv Mat data error!");
 		exit(-1);
 	    }
 	    length += ret;
 	}
-    } //for-end 
-    imshow("recv", _buff);
-    waitKey(30);
 
+    }    
 }
 
 /* 改变图像尺寸 */
 void Recvideo::changeSize()
 {
     int ret;//接受返回值
+
+    //开始接受数据
+    recvStart();
+
 
     //接受Mat行
     ret = recvfrom(_fd, &_row, sizeof(int), 0, (struct sockaddr*)&_sendip, &_addrlen);
@@ -102,16 +126,42 @@ void Recvideo::changeSize()
 	perror("recv col data error!");
 	exit(-1);
     }
-    //cout<<_row<<":"<<_col<<endl;
-        
+cout<<_row<<":"<<_col<<endl;
+    //开始初始化缓冲区
+    for(int i = 0; i < _BUFF_CNT; ++i)
+    {
+	_buff1[i] = Mat::zeros(_row, _col, CV_8UC3);
+	_buff2[i] = Mat::zeros(_row, _col, CV_8UC3);
+    }
+    
 }
 
 /* 显示视频 */
 void Recvideo::playVideo()
 {
-  recVideo();
-  imshow("recv",_buff);
-  waitKey(20);
+    //显示缓冲1
+    if(_bFlag1)
+    {
+	for(int i = 0; i < _BUFF_CNT; ++i)
+	{
+	    imshow("recv",_buff1[i]);
+	    waitKey(10);
+	}
+	_bFlag1 = !_bFlag1;
+
+    }
+
+    //显示缓冲2
+    if(_bFlag2)
+    {
+	for(int i = 0; i < _BUFF_CNT; ++i)
+	{
+	    imshow("recv",_buff2[i]);
+	    waitKey(10);
+	}
+	_bFlag2 = !_bFlag2;
+    }
+
 }
  
 /* 视频接受开始确认 */
@@ -120,7 +170,7 @@ void Recvideo::recvStart()
     int ret,//接受返回值
 	flag;//接受帧结束标志
 
-    while(1)
+    while(!_vStart)
     {
 	//接受一帧的开始位置，减小图像错位
 	ret = recvfrom(_fd, &flag, sizeof(int), 0, NULL, NULL);
@@ -133,12 +183,17 @@ void Recvideo::recvStart()
 	//接受一帧的开始位置,开始接受
 	if(_endFlag == flag)
 	{
-	    break;
-	   // _vStart = true;
+	    _vStart = true;
 
 	}	
     }
-    //cout << flag << endl;
 	//接收完毕，重新开始接受
-	//_vStart = false;
+	_vStart = false;
+	cout<<flag<<endl;
+}
+
+/* 创建接受和缓存线程 */
+void Recvideo::createThread()
+{
+    //recvBuff
 }

@@ -1,0 +1,17 @@
+/*************************************************************************
+* Author: MASnail
+* Created Time: 2016年12月21日 星期三 00时00分57秒
+* File Name: Video.cc
+* Description: C++ file
+************************************************************************/
+#include "Video.h"
+
+static void Video::playVideo()
+{
+    _thread.playVideo(_recvideo.playVideo(NULL));
+}
+
+static void Video::recvBuff()
+{
+    _thread.recvBuff(_recvideo.recvBuff(NULL));
+}
