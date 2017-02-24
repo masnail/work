@@ -18,7 +18,7 @@ Recvideo::Recvideo()
     fclose(fp);
 
     //初始化socket
-    socket_server_udp(&_fd,atoi(_port));
+    _fd = socket_server_udp(atoi(_port));
     memset(&_sendip, 0, sizeof(struct sockaddr_in));
     
     _row = 200;

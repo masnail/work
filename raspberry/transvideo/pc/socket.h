@@ -9,16 +9,16 @@
 #define FUNC_HEAD_H
 
 
-#include "head.h"
+#include <sys/types.h>
+#include <sys/socket.h>
 
-void socket_server_tcp(int*,int,/*char*,*/int);
 
-void socket_accep(int,int*,struct sockaddr*);
+int socket_server_tcp(int,/*char*,*/int);
 
-void socket_client_tcp(int*,int,char*);
+int socket_client_tcp(int,char*);
 
-void socket_server_udp(int*,int);
+int socket_server_udp(int);
 
-void socket_client_udp(int*,int,char*, struct sockaddr_in*);
+int socket_client_udp(int,char*, struct sockaddr_in*);
 
 #endif

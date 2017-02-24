@@ -2,23 +2,30 @@
  Author:MASnail
  Created Time: 2016年07月08日 星期五 13时55分42秒
  File Name: socket.h
- Description: 
+ Description: 暂时支持IPV4，没有添加支持IPV6机制
  ************************************************************************/
 
 #include "socket.h"
 
+/*
+ * port 服务器的端口号
+ * concnt 服务器的最大可连接的数量
+ *
+ * 返回服务器端得到的套接字描述符fd_sock
+ *
+ */
 
-void socket_server_tcp(int *fd_sock,int port,/*char *ipchar,*/int concnt)
+int socket_server_tcp(int port,/*char *ipchar,*/int concnt)
 {
-	*fd_sock = socket(AF_INET,SOCK_STREAM,0);
-	if(-1 == *fd_sock)
+	int fd_sock = socket(AF_INET,SOCK_STREAM,0);
+	if(-1 == fd_sock)
 	{
 		perror("socket");
 		exit(0);
 	}
 
 	int cancel_port=0;//cancel port res
-	setsockopt(*fd_sock,SOL_SOCKET,SO_REUSEADDR,(const void*)&cancel_port,sizeof(int));
+	setsockopt(fd_sock,SOL_SOCKET,SO_REUSEADDR,(const void*)&cancel_port,sizeof(int));
 
 	struct sockaddr_in ip_addr;
 	memset(&ip_addr,0,sizeof(ip_addr));
@@ -27,45 +34,46 @@ void socket_server_tcp(int *fd_sock,int port,/*char *ipchar,*/int concnt)
 	ip_addr.sin_addr.s_addr=/*inet_addr(ipchar);*/htonl(INADDR_ANY);
 
 	int ret;
-	ret = bind(*fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
+	ret = bind(fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
 	if(-1 == ret)
 	{
 		perror("bind");
-		close(*fd_sock);
+		close(fd_sock);
 		exit(0);
 	}
 	
-	ret = listen(*fd_sock,concnt);
+	ret = listen(fd_sock,concnt);
 	if(-1 == ret)
 	{
 		perror("listen");
-		close(*fd_sock);
+		close(fd_sock);
 		exit(0);
 	}
+
+	return fd_sock;
+
 }
 
-/*void socket_accept(int fd_sock,int *newfd,struct sockaddr *ip_addr)
-{
-	int addrlen = 0;
-	if(!ip_addr)
-		addrlen = sizeof(struct sockaddr);
-	*newfd = accept(fd_sock,ip_addr,&addrlen);
-	if(-1 == *newfd)
-	{
-		perror("accept");
-		exit(0);
-	}
-}*/
 
+/*
+ * port 客户端的端口号
+ * ipchar 客户端要连接到服务器端的ip
+ * 
+ * 返回客户端得到的套接字描述符fd_sock
+ *
+ */
 
-void socket_client_tcp(int *fd_sock,int port,char *ipchar)
+int  socket_client_tcp(int port,char *ipchar)
 {
-	*fd_sock = socket(AF_INET,SOCK_STREAM,0);
-	if(-1 == *fd_sock)
+	int fd_sock = socket(AF_INET,SOCK_STREAM,0);
+	if(-1 == fd_sock)
 	{
 		perror("socket");
 		exit(0);
 	}
+
+	int cancel_port=0;//cancel port res
+	setsockopt(fd_sock,SOL_SOCKET,SO_REUSEADDR,(const void*)&cancel_port,sizeof(int));
 
 	struct sockaddr_in ip_addr;
 	memset(&ip_addr,0,sizeof(ip_addr));
@@ -74,24 +82,34 @@ void socket_client_tcp(int *fd_sock,int port,char *ipchar)
 	ip_addr.sin_addr.s_addr=inet_addr(ipchar);
 	
 	int ret;
-	ret = connect(*fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
+	ret = connect(fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
 	if(-1 == ret)
 	{
 		perror("connect");
-		close(*fd_sock);
+		close(fd_sock);
 		exit(0);
 	}
+
+	return fd_sock;
 }
 
 
-void socket_server_udp(int *fd_sock,int port)
+/*
+ * port 服务器的端口号
+ * 
+ * 返回服务器端得到的套接字描述符fd_sock
+ *
+ */
+
+int socket_server_udp(int port)
 {
-	*fd_sock = socket(AF_INET,SOCK_DGRAM,0);
-	if(-1 == *fd_sock)
+	int fd_sock = socket(AF_INET,SOCK_DGRAM,0);
+	if(-1 == fd_sock)
 	{
 		perror("socket");
 		exit(0);
 	}
+
 	struct sockaddr_in ip_addr;
 	memset(&ip_addr,0,sizeof(ip_addr));
 	ip_addr.sin_family=AF_INET;
@@ -99,21 +117,31 @@ void socket_server_udp(int *fd_sock,int port)
 	ip_addr.sin_addr.s_addr=htonl(INADDR_ANY);
 
 	int ret;
-	ret = bind(*fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
+	ret = bind(fd_sock,(struct sockaddr*)&ip_addr,sizeof(struct sockaddr));
 	if(-1 == ret)
 	{
 		perror("bind");
-		close(*fd_sock);
+		close(fd_sock);
 		exit(0);
 	}	
+
+	return fd_sock;
 }
 
 
+/*
+ * port 客户端的端口号
+ * ipchar 客户端要连接到服务器端的IP
+ * ip_addr 返回要发送到服务器端的ip地址结构
+ *
+ * 返回客户端端得到的套接字描述符fd_sock
+ *
+ */
 
-void socket_client_udp(int *fd_sock,int port,char *ipchar,struct sockaddr_in *ip_addr)
+int socket_client_udp(int port,char *ipchar,struct sockaddr_in *ip_addr)
 {
-	*fd_sock = socket(AF_INET,SOCK_DGRAM,0);
-	if(-1 == *fd_sock)
+	int fd_sock = socket(AF_INET,SOCK_DGRAM,0);
+	if(-1 == fd_sock)
 	{
 		perror("socket");
 		exit(0);
@@ -123,6 +151,8 @@ void socket_client_udp(int *fd_sock,int port,char *ipchar,struct sockaddr_in *ip
 	(*ip_addr).sin_family=AF_INET;
 	(*ip_addr).sin_port=htons(port);
 	(*ip_addr).sin_addr.s_addr=inet_addr(ipchar);//INADDR_ANY;
+
+	return fd_sock;
 
 }
 
